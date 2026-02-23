@@ -36,13 +36,13 @@ const upload = multer({
   }
 });
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+const app = express();
+const PORT = 3000;
 
-  app.use(express.json());
-  app.use("/uploads", express.static(uploadDir));
+app.use(express.json());
+app.use("/uploads", express.static(uploadDir));
 
+async function setupServer() {
   // API Routes
   app.post("/api/upload", upload.single("file"), (req, res) => {
     if (!req.file) {
@@ -271,10 +271,17 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static("dist"));
+    // In production, serve static files from dist
+    const distPath = path.resolve(process.cwd(), "dist");
+    if (fs.existsSync(distPath)) {
+      app.use(express.static(distPath));
+      app.get("*", (req, res, next) => {
+        if (req.path.startsWith("/api")) return next();
+        res.sendFile(path.resolve(distPath, "index.html"));
+      });
+    }
   }
 
-  // Initialize default form settings if they don't exist
   const defaultContactForm = [
     { name: 'name', label: 'First Name', type: 'text', required: true },
     { name: 'surname', label: 'Last Name', type: 'text', required: true },
@@ -302,10 +309,14 @@ async function startServer() {
     }
   };
   initSettings();
+}
 
+setupServer();
+
+if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
 
-startServer();
+export default app;

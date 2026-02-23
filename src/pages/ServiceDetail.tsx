@@ -23,13 +23,13 @@ export default function ServiceDetail() {
     { name: 'notes', label: 'Notes', type: 'textarea', required: false }
   ];
 
-  const fields = settings?.courseForm && settings.courseForm.length > 0 ? settings.courseForm : defaultFields;
+  const fields = settings?.course_form && settings.course_form.length > 0 ? settings.course_form : defaultFields;
 
   useEffect(() => {
     const initialData: any = {};
     fields.forEach(f => initialData[f.name] = '');
     setFormData(initialData);
-  }, [settings?.courseForm]);
+  }, [settings?.course_form]);
 
   useEffect(() => {
     setLoading(true);

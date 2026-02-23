@@ -11,22 +11,46 @@ export default function Layout() {
 
   useEffect(() => {
     const fetchSettings = async () => {
-      const [header, footer, company, theme, contactForm, courseForm] = await Promise.all([
-        fetch('/api/settings/header').then(r => r.json()),
-        fetch('/api/settings/footer').then(r => r.json()),
-        fetch('/api/settings/company_details').then(r => r.json().catch(() => null)),
-        fetch('/api/settings/theme_settings').then(r => r.json().catch(() => null)),
-        fetch('/api/settings/contact_form').then(r => r.json().catch(() => [])),
-        fetch('/api/settings/course_form').then(r => r.json().catch(() => []))
-      ]);
-      setSettings({ 
-        header, 
-        footer, 
-        company: company || { name: header.siteName, logo: "" },
-        theme: theme || { primaryColor: "#facc15", secondaryColor: "#0f172a", fontFamily: "Inter" },
-        contactForm,
-        courseForm
-      });
+      try {
+        const [header, footer, company, theme, contactForm, courseForm] = await Promise.all([
+          fetch('/api/settings/header').then(r => r.ok ? r.json() : Promise.reject('Failed')),
+          fetch('/api/settings/footer').then(r => r.ok ? r.json() : Promise.reject('Failed')),
+          fetch('/api/settings/company_details').then(r => r.json().catch(() => null)),
+          fetch('/api/settings/theme_settings').then(r => r.json().catch(() => null)),
+          fetch('/api/settings/contact_form').then(r => r.json().catch(() => [])),
+          fetch('/api/settings/course_form').then(r => r.json().catch(() => []))
+        ]);
+        setSettings({ 
+          header, 
+          footer, 
+          company: company || { name: header.siteName, logo: "" },
+          theme: theme || { primaryColor: "#facc15", secondaryColor: "#0f172a", fontFamily: "Inter" },
+          contactForm,
+          courseForm
+        });
+      } catch (error) {
+        console.error("Failed to fetch settings, using defaults", error);
+        setSettings({
+          header: {
+            logoText: "TR",
+            siteName: "TrainingPro",
+            navLinks: [
+              { label: "Home", path: "/" },
+              { label: "Catalog", path: "/catalog" },
+              { label: "About", path: "/about" },
+              { label: "Locations", path: "/locations" }
+            ]
+          },
+          footer: {
+            copyright: "TrainingPro Inc. All rights reserved.",
+            socialLinks: []
+          },
+          company: { name: "TrainingPro Inc.", address: "", phone: "", email: "" },
+          theme: { primaryColor: "#facc15", secondaryColor: "#0f172a", fontFamily: "Inter" },
+          contactForm: [],
+          courseForm: []
+        });
+      }
     };
     fetchSettings();
   }, []);

@@ -8,7 +8,7 @@ export default function About() {
 
   useEffect(() => {
     fetch('/api/settings/about')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject('Failed'))
       .then(data => {
         // Normalize heroImages
         if (!data.heroImages) {
@@ -16,12 +16,25 @@ export default function About() {
         }
         setSettings(data);
       })
-      .catch(err => console.error("Failed to fetch about settings", err));
+      .catch(err => {
+        console.error("Failed to fetch about settings", err);
+        setSettings({
+          heroImages: ["https://picsum.photos/seed/about/1920/1080"],
+          mission: "To empower workforces with the knowledge, skills, and confidence to operate safely and efficiently.",
+          vision: "To be the undisputed leader in industrial and safety training.",
+          milestones: [
+            { year: "2010", title: "Founded", desc: "Started as a small local training provider." }
+          ]
+        });
+      });
 
     fetch('/api/jobs')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject('Failed'))
       .then(data => setJobs(data))
-      .catch(err => console.error("Failed to fetch jobs", err));
+      .catch(err => {
+        console.error("Failed to fetch jobs", err);
+        setJobs([]);
+      });
   }, []);
 
   useEffect(() => {

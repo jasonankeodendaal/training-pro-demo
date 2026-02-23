@@ -19,19 +19,33 @@ export default function Home() {
 
   useEffect(() => {
     fetch('/api/services')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject('Failed'))
       .then(data => setServices(data))
-      .catch(err => console.error("Failed to fetch services", err));
+      .catch(err => {
+        console.error("Failed to fetch services", err);
+        setServices([]);
+      });
 
     fetch('/api/jobs')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject('Failed'))
       .then(data => setJobs(data))
-      .catch(err => console.error("Failed to fetch jobs", err));
+      .catch(err => {
+        console.error("Failed to fetch jobs", err);
+        setJobs([]);
+      });
 
     fetch('/api/settings/home')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject('Failed'))
       .then(data => setSettings(data))
-      .catch(err => console.error("Failed to fetch home settings", err));
+      .catch(err => {
+        console.error("Failed to fetch home settings", err);
+        setSettings({
+          heroImages: ["https://picsum.photos/seed/hero1/1920/1080"],
+          heroTitle: "Safety Excellence Without Compromise.",
+          heroSubtitle: "Delivering industry-leading safety and operational training since 2010.",
+          ctaButtons: [{ text: "Read More", url: "/about", primary: true }]
+        });
+      });
   }, []);
 
   useEffect(() => {
