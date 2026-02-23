@@ -6,7 +6,7 @@ import path from "path";
 import fs from "fs";
 
 // Ensure uploads directory exists
-const uploadDir = path.resolve("uploads");
+const uploadDir = process.env.VERCEL ? path.join("/tmp", "uploads") : path.resolve("uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
