@@ -79,79 +79,49 @@ if (jobCount.count === 0) {
 
   const defaultJobs = [
     {
-      title: "Major Warehouse Safety Overhaul",
-      description: "We conducted a full-scale safety audit and training program for a 500,000 sq ft logistics hub. This involved certifying over 200 forklift operators and implementing new emergency protocols.",
+      title: "Logistics Hub Forklift Certification",
+      description: "Conducted a mass certification program for a major regional distribution center. Over 45 operators were trained and certified on Counterbalance and Reach trucks within a 2-week window, ensuring zero downtime for the client.",
       images: JSON.stringify([
         "https://picsum.photos/seed/job1/1200/800",
         "https://picsum.photos/seed/job1b/1200/800",
         "https://picsum.photos/seed/job1c/1200/800"
       ]),
       videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-      bulletPoints: JSON.stringify([
-        "Certified 200+ operators in 3 weeks",
-        "Reduced workplace incidents by 45% in the first quarter",
-        "Implemented digital tracking for equipment maintenance",
-        "Conducted night-shift specific safety drills"
+      howItWorks: JSON.stringify([
+        "Certified 45+ operators in 14 days",
+        "Implemented new pre-shift inspection protocols",
+        "Reduced equipment damage reports by 30%",
+        "On-site theory and practical assessments"
       ])
     },
     {
-      title: "Offshore Rig Safety Training",
-      description: "Our specialized team traveled to the North Sea to provide advanced working-at-heights and rescue training for offshore personnel. The environment required high-intensity practical simulations.",
+      title: "Construction Site Height Safety Audit",
+      description: "Provided specialized height safety training and equipment audits for a high-rise residential development. Our team certified 15 scaffolding supervisors and implemented a new harness inspection regime.",
       images: JSON.stringify([
         "https://picsum.photos/seed/job2/1200/800",
         "https://picsum.photos/seed/job2b/1200/800"
       ]),
       videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-      bulletPoints: JSON.stringify([
-        "Specialized rescue-at-sea protocols",
-        "High-wind environment harness training",
-        "Emergency evacuation coordination",
-        "Multi-agency communication drills"
+      howItWorks: JSON.stringify([
+        "Zero fall incidents recorded during build",
+        "Advanced rescue-from-height protocols",
+        "Harness and lanyard inspection training",
+        "Daily safety briefing integration"
       ])
     },
     {
-      title: "Agricultural Fleet Certification",
-      description: "Working with a large farming cooperative, we certified a fleet of 50 tractor operators across multiple locations. The focus was on modern GPS-guided machinery and road safety.",
+      title: "Agricultural Cooperative Tractor Safety",
+      description: "A large-scale training initiative for a farming cooperative, focusing on safe tractor operation and implement handling for seasonal workers. Training was delivered in multiple languages to ensure full comprehension.",
       images: JSON.stringify([
         "https://picsum.photos/seed/job3/1200/800",
         "https://picsum.photos/seed/job3b/1200/800"
       ]),
       videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-      bulletPoints: JSON.stringify([
-        "GPS and autonomous machinery training",
-        "Public road transit safety compliance",
-        "Attachment and implement handling",
-        "Soil compaction prevention techniques"
-      ])
-    },
-    {
-      title: "Construction Site Height Safety",
-      description: "Provided comprehensive scaffolding and MEWP training for a major city center development project. Our training ensured zero fall incidents during the 18-month build phase.",
-      images: JSON.stringify([
-        "https://picsum.photos/seed/job4/1200/800",
-        "https://picsum.photos/seed/job4b/1200/800"
-      ]),
-      videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-      bulletPoints: JSON.stringify([
-        "Zero fall incidents recorded",
-        "Daily equipment inspection training",
-        "Advanced harness and lanyard systems",
-        "Coordinated rescue plans for crane operators"
-      ])
-    },
-    {
-      title: "Corporate First Aid Rollout",
-      description: "Implemented a company-wide first aid responder program for a multinational tech firm. We trained 10% of the workforce to ensure immediate response capability across all floors.",
-      images: JSON.stringify([
-        "https://picsum.photos/seed/job5/1200/800",
-        "https://picsum.photos/seed/job5b/1200/800"
-      ]),
-      videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-      bulletPoints: JSON.stringify([
-        "Trained 150+ corporate responders",
-        "AED installation and training across 5 sites",
-        "Mental health first aid integration",
-        "Customized emergency response mobile app"
+      howItWorks: JSON.stringify([
+        "Multi-lingual training delivery",
+        "Focus on PTO and trailer safety",
+        "Field-based practical assessments",
+        "Maintenance and daily check routines"
       ])
     }
   ];
@@ -171,56 +141,69 @@ if (count.count === 0) {
 
   const defaultServices = [
     {
-      title: "CPCS Plant Training",
-      description: "Industry-standard certification for plant machinery operation. We provide comprehensive training for excavators, dumpers, and telehandlers with both theory and practical assessments.",
-      icon: "Tractor",
-      images: JSON.stringify(["https://picsum.photos/seed/cpcs1/800/600", "https://picsum.photos/seed/cpcs2/800/600"]),
-      videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-      howItWorks: JSON.stringify(["Equipment Familiarization", "Safe Operating Procedures", "Practical Maneuvers", "Technical Test"]),
-      checklistOptions: JSON.stringify(["Excavator 360", "Forward Tipping Dumper", "Telehandler", "Ride on Roller"]),
-      benefits: JSON.stringify([{ title: "Blue Competent Card", description: "Path to achieving your full blue card." }, { title: "High Demand", description: "Certified operators are in high demand across the UK." }]),
-      modules: JSON.stringify([{ title: "Pre-start Checks", text: "Daily maintenance and safety inspections." }, { title: "Site Safety", text: "Navigating busy construction environments safely." }]),
-      accreditation: "CPCS Accredited",
-      whatsappNumber: "+447700900000"
-    },
-    {
-      title: "NPORS Certification",
-      description: "Flexible plant operator certification recognized across the construction and industrial sectors. Suitable for both experienced workers and novices.",
+      title: "Counterbalance Forklift (Novice)",
+      description: "Comprehensive 5-day training for beginners on counterbalance forklift trucks. Covers pre-use inspections, load handling, and safe maneuvering in tight spaces.",
       icon: "Forklift",
-      images: JSON.stringify(["https://picsum.photos/seed/npors1/800/600", "https://picsum.photos/seed/npors2/800/600"]),
+      images: JSON.stringify(["https://picsum.photos/seed/fl1/800/600", "https://picsum.photos/seed/fl2/800/600"]),
       videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-      howItWorks: JSON.stringify(["Registration", "Training Session", "Practical Assessment", "Card Issuance"]),
-      checklistOptions: JSON.stringify(["Industrial Forklift", "Rough Terrain Forklift", "MEWP Boom", "Slinger Signaller"]),
-      benefits: JSON.stringify([{ title: "Nationwide Recognition", description: "Accepted on major sites including HS2 and Hinkley Point." }]),
-      modules: JSON.stringify([{ title: "Load Stability", text: "Understanding center of gravity and load charts." }]),
-      accreditation: "NPORS Registered",
-      whatsappNumber: "+447700900000"
+      howItWorks: JSON.stringify(["Theory & Safety Legislation", "Pre-Shift Inspections", "Basic Steering & Maneuvering", "Stacking & De-stacking", "Practical & Theory Testing"]),
+      checklistOptions: JSON.stringify(["B1 (Up to 5t)", "B2 (5t to 15t)", "B3 (Over 15t)", "Refresher Course"]),
+      benefits: JSON.stringify([{ title: "RTITB Accredited", description: "Nationally recognized certification." }, { title: "Safety First", description: "Drastically reduce workplace accidents." }]),
+      modules: JSON.stringify([{ title: "Health & Safety", text: "HASWA 1974 and PUWER 98 regulations." }, { title: "Stability", text: "Understanding the stability triangle and center of gravity." }]),
+      accreditation: "RTITB Accredited Certificate",
+      whatsappNumber: "+44123456789"
     },
     {
-      title: "Health & Safety Level 1",
-      description: "Essential for obtaining your CSCS Green Card. This course covers the fundamentals of site safety, personal protective equipment, and hazard awareness.",
-      icon: "ShieldAlert",
-      images: JSON.stringify(["https://picsum.photos/seed/hslevel1/800/600"]),
+      title: "Agricultural Tractor (Lantra)",
+      description: "Professional tractor operation and maintenance training for agricultural and industrial use. Includes trailer hitching and PTO safety.",
+      icon: "Tractor",
+      images: JSON.stringify(["https://picsum.photos/seed/tr1/800/600", "https://picsum.photos/seed/tr2/800/600"]),
       videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-      howItWorks: JSON.stringify(["Classroom Learning", "Interactive Workshops", "Mock Exams", "Final CITB Test"]),
-      checklistOptions: JSON.stringify(["CSCS Green Card", "Manual Handling", "Asbestos Awareness", "Working at Heights"]),
-      benefits: JSON.stringify([{ title: "Site Access", description: "Mandatory for entry-level work on most UK construction sites." }]),
-      modules: JSON.stringify([{ title: "Risk Assessment", text: "How to identify and mitigate common site hazards." }]),
-      accreditation: "CITB Approved",
-      whatsappNumber: "+447700900000"
+      howItWorks: JSON.stringify(["Daily Maintenance Checks", "Safe Driving Techniques", "Implement Attachment (3-point linkage)", "PTO Safety & Operation", "Reversing with Trailers"]),
+      checklistOptions: JSON.stringify(["Basic Operation", "Advanced Implements", "Road Safety", "PTO Specialization"]),
+      benefits: JSON.stringify([{ title: "Lantra Awards", description: "Industry standard for land-based sectors." }]),
+      modules: JSON.stringify([{ title: "Daily Checks", text: "Oil, water, tires, and safety guards." }]),
+      accreditation: "Lantra Awards Certification",
+      whatsappNumber: "+44123456789"
     },
     {
-      title: "First Aid at Work (FAW)",
-      description: "Qualify as a designated first aider in your workplace. This 3-day course provides comprehensive life-saving skills and emergency response training.",
+      title: "Emergency First Aid at Work",
+      description: "A 1-day course designed for low-risk work environments. Learn life-saving skills including CPR, choking, and wound management.",
       icon: "HeartPulse",
-      images: JSON.stringify(["https://picsum.photos/seed/faw1/800/600"]),
+      images: JSON.stringify(["https://picsum.photos/seed/fa1/800/600", "https://picsum.photos/seed/fa2/800/600"]),
       videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-      howItWorks: JSON.stringify(["Theory Sessions", "Practical Scenarios", "CPR Practice", "Final Assessment"]),
-      checklistOptions: JSON.stringify(["3-Day Full Course", "2-Day Refresher", "1-Day Emergency First Aid"]),
-      benefits: JSON.stringify([{ title: "HSE Compliant", description: "Meets all Health and Safety Executive requirements for workplace first aid." }]),
-      modules: JSON.stringify([{ title: "Resuscitation", text: "Adult CPR and AED (Defibrillator) usage." }]),
-      accreditation: "Qualsafe Awards",
-      whatsappNumber: "+447700900000"
+      howItWorks: JSON.stringify(["Primary Survey (DRABC)", "CPR & AED Usage", "Managing Unconscious Casualties", "Choking & Bleeding Control", "Shock & Minor Injuries"]),
+      checklistOptions: JSON.stringify(["1-Day EFAW", "3-Day FAW", "AED Training", "Paediatric First Aid"]),
+      benefits: JSON.stringify([{ title: "HSE Compliant", description: "Meets Health and Safety Executive requirements." }]),
+      modules: JSON.stringify([{ title: "Resuscitation", text: "Adult CPR and use of an Automated External Defibrillator." }]),
+      accreditation: "Qualsafe Awards Approved",
+      whatsappNumber: "+44123456789"
+    },
+    {
+      title: "Working at Heights (IPAF)",
+      description: "Essential training for the safe use of Mobile Elevating Work Platforms (MEWPs). Covers Scissor Lifts (3a) and Cherry Pickers (3b).",
+      icon: "Mountain",
+      images: JSON.stringify(["https://picsum.photos/seed/wh1/800/600", "https://picsum.photos/seed/wh2/800/600"]),
+      videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+      howItWorks: JSON.stringify(["Pre-use Inspection", "Emergency Lowering Procedures", "Safe Positioning", "Harness & Lanyard Usage", "Practical Assessment"]),
+      checklistOptions: JSON.stringify(["3a (Scissor Lift)", "3b (Cherry Picker)", "1b (Static Boom)", "Harness Awareness"]),
+      benefits: JSON.stringify([{ title: "PAL Card", description: "Recognized worldwide for height safety." }]),
+      modules: JSON.stringify([{ title: "Site Safety", text: "Identifying overhead hazards and ground conditions." }]),
+      accreditation: "IPAF PAL Card",
+      whatsappNumber: "+44123456789"
+    },
+    {
+      title: "Health & Safety Awareness",
+      description: "A foundational course for construction workers and site visitors. Covers the basics of site safety, risk assessment, and personal protective equipment.",
+      icon: "ShieldAlert",
+      images: JSON.stringify(["https://picsum.photos/seed/hs1/800/600", "https://picsum.photos/seed/hs2/800/600"]),
+      videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+      howItWorks: JSON.stringify(["Legal Responsibilities", "Risk Assessment Basics", "Manual Handling", "Fire Safety & COSHH", "Accident Reporting"]),
+      checklistOptions: JSON.stringify(["CSCS Green Card Prep", "Site Safety Plus", "Risk Assessment Workshop", "COSHH Awareness"]),
+      benefits: JSON.stringify([{ title: "CSCS Path", description: "Required for the Green Laborer Card." }]),
+      modules: JSON.stringify([{ title: "PPE", text: "Correct selection and use of safety equipment." }]),
+      accreditation: "CITB Site Safety Plus",
+      whatsappNumber: "+44123456789"
     }
   ];
 

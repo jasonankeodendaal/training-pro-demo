@@ -324,6 +324,195 @@ function JobCardForm({ lead, services, onComplete }: { lead: any, services: any[
   );
 }
 
+function FormsManager({ settings, setSettings }: { settings: any, setSettings: (s: any) => void }) {
+  const [activeForm, setActiveForm] = useState<'contact' | 'course'>('contact');
+  
+  const addField = (formKey: 'contact_form' | 'course_form') => {
+    const newField = { name: `field_${Date.now()}`, label: 'New Field', type: 'text', required: false };
+    const updated = [...(settings[formKey] || []), newField];
+    setSettings({ ...settings, [formKey]: updated });
+  };
+
+  const removeField = (formKey: 'contact_form' | 'course_form', idx: number) => {
+    const updated = [...(settings[formKey] || [])];
+    updated.splice(idx, 1);
+    setSettings({ ...settings, [formKey]: updated });
+  };
+
+  const updateField = (formKey: 'contact_form' | 'course_form', idx: number, key: string, value: any) => {
+    const updated = [...(settings[formKey] || [])];
+    updated[idx] = { ...updated[idx], [key]: value };
+    setSettings({ ...settings, [formKey]: updated });
+  };
+
+  const saveForms = async () => {
+    try {
+      await Promise.all([
+        fetch('/api/settings/contact_form', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(settings.contact_form)
+        }),
+        fetch('/api/settings/course_form', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(settings.course_form)
+        })
+      ]);
+      alert('Forms updated successfully!');
+    } catch (e) {
+      alert('Failed to update forms');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div className="flex gap-4">
+          <button 
+            onClick={() => setActiveForm('contact')}
+            className={`px-6 py-2 rounded-xl font-bold transition-all ${activeForm === 'contact' ? 'bg-primary text-secondary shadow-md' : 'bg-slate-100 text-slate-500'}`}
+          >
+            Contact Form
+          </button>
+          <button 
+            onClick={() => setActiveForm('course')}
+            className={`px-6 py-2 rounded-xl font-bold transition-all ${activeForm === 'course' ? 'bg-primary text-secondary shadow-md' : 'bg-slate-100 text-slate-500'}`}
+          >
+            Course Enrollment
+          </button>
+        </div>
+        <button 
+          onClick={saveForms}
+          className="bg-secondary text-white px-8 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-800 transition-all"
+        >
+          <Save className="w-4 h-4" /> Save All
+        </button>
+      </div>
+
+      <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+        <div className="flex justify-between items-center mb-8">
+          <h3 className="text-2xl font-bold text-secondary">
+            {activeForm === 'contact' ? 'Contact Us Form Fields' : 'Course Enrollment Form Fields'}
+          </h3>
+          <button 
+            onClick={() => addField(activeForm === 'contact' ? 'contact_form' : 'course_form')}
+            className="text-primary font-bold flex items-center gap-1 hover:underline"
+          >
+            <Plus className="w-4 h-4" /> Add Field
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {(settings[activeForm === 'contact' ? 'contact_form' : 'course_form'] || []).map((field: any, idx: number) => (
+            <div key={idx} className="p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-4 group relative">
+              <button 
+                onClick={() => removeField(activeForm === 'contact' ? 'contact_form' : 'course_form', idx)}
+                className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">Label</label>
+                  <input 
+                    type="text" 
+                    value={field.label} 
+                    onChange={(e) => updateField(activeForm === 'contact' ? 'contact_form' : 'course_form', idx, 'label', e.target.value)}
+                    className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">Name (ID)</label>
+                  <input 
+                    type="text" 
+                    value={field.name} 
+                    onChange={(e) => updateField(activeForm === 'contact' ? 'contact_form' : 'course_form', idx, 'name', e.target.value)}
+                    className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">Type</label>
+                  <select 
+                    value={field.type} 
+                    onChange={(e) => updateField(activeForm === 'contact' ? 'contact_form' : 'course_form', idx, 'type', e.target.value)}
+                    className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none"
+                  >
+                    <option value="text">Text</option>
+                    <option value="email">Email</option>
+                    <option value="tel">Phone</option>
+                    <option value="number">Number</option>
+                    <option value="textarea">Textarea</option>
+                  </select>
+                </div>
+                <div className="flex items-end pb-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={field.required} 
+                      onChange={(e) => updateField(activeForm === 'contact' ? 'contact_form' : 'course_form', idx, 'required', e.target.checked)}
+                      className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary"
+                    />
+                    <span className="text-sm font-bold text-slate-700">Required</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function JobsManager({ jobs, onEdit, onDelete }: { jobs: any[], onEdit: (j: any) => void, onDelete: (id: number) => void }) {
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-between items-center bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+        <h2 className="text-3xl font-bold text-secondary tracking-tight">Past Jobs Gallery</h2>
+        <button 
+          onClick={() => onEdit({ title: '', description: '', images: '[]', videoUrl: '', howItWorks: '[]' })}
+          className="bg-primary text-secondary px-8 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition-all shadow-lg"
+        >
+          <Plus className="w-5 h-5" /> Add New Job
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {jobs.map((job) => (
+          <div key={job.id} className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden group hover:shadow-xl transition-all">
+            <div className="aspect-video relative overflow-hidden">
+              {job.images && JSON.parse(job.images).length > 0 ? (
+                <img src={JSON.parse(job.images)[0]} alt={job.title} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
+              ) : (
+                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300">No Image</div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent opacity-0 group-hover:opacity-100 transition-all flex items-end p-6">
+                <div className="flex gap-2 w-full">
+                  <button onClick={() => onEdit(job)} className="flex-1 bg-white text-secondary py-2 rounded-xl font-bold text-sm">Edit</button>
+                  <button onClick={() => onDelete(job.id)} className="flex-1 bg-red-500 text-white py-2 rounded-xl font-bold text-sm">Delete</button>
+                </div>
+              </div>
+            </div>
+            <div className="p-8">
+              <h3 className="text-xl font-bold text-secondary mb-2 line-clamp-1">{job.title}</h3>
+              <p className="text-slate-500 text-sm line-clamp-2 mb-4 font-medium">{job.description}</p>
+              <div className="flex items-center gap-2 text-primary">
+                <CheckSquare className="w-4 h-4" />
+                <span className="text-xs font-black uppercase tracking-widest">{JSON.parse(job.howItWorks || '[]').length} Milestones</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Admin() {
   const [activeTab, setActiveTab] = useState('leads');
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -828,82 +1017,40 @@ export default function Admin() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-slate-100 pb-20 md:pb-0">
-      {/* Sidebar (Desktop) */}
-      <aside className="hidden md:flex w-64 bg-slate-900 text-white flex-col fixed h-full z-50">
-        <div className="p-6 border-b border-slate-800">
-          <h1 className="text-xl font-bold tracking-tight">Admin Control</h1>
-        </div>
-        <nav className="flex-grow p-4 space-y-2">
-          <button 
-            onClick={() => setActiveTab('leads')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${activeTab === 'leads' ? 'bg-yellow-400 text-slate-900' : 'hover:bg-slate-800 text-slate-400'}`}
-          >
-            <Users className="w-5 h-5" />
-            <span className="font-medium">Service Leads</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('job-cards')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${activeTab === 'job-cards' ? 'bg-yellow-400 text-slate-900' : 'hover:bg-slate-800 text-slate-400'}`}
-          >
-            <CheckSquare className="w-5 h-5" />
-            <span className="font-medium">Job Cards</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('services')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${activeTab === 'services' ? 'bg-yellow-400 text-slate-900' : 'hover:bg-slate-800 text-slate-400'}`}
-          >
-            <BookOpen className="w-5 h-5" />
-            <span className="font-medium">Services Manager</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('about')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${activeTab === 'about' ? 'bg-yellow-400 text-slate-900' : 'hover:bg-slate-800 text-slate-400'}`}
-          >
-            <Users className="w-5 h-5" />
-            <span className="font-medium">About/Roadmap</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('company')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${activeTab === 'company' ? 'bg-yellow-400 text-slate-900' : 'hover:bg-slate-800 text-slate-400'}`}
-          >
-            <Building className="w-5 h-5" />
-            <span className="font-medium">Company & Theme</span>
-          </button>
-        </nav>
-      </aside>
-
-      {/* Mobile Bottom Tab Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 text-white flex justify-around items-center h-16 z-50 px-2 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+    <div className="flex flex-col min-h-screen bg-slate-100 pb-24">
+      {/* Unified Bottom Tab Bar (App Feeling) */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-slate-900 text-white flex justify-around items-center h-20 z-[100] px-4 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.3)] border-t border-white/5">
         {/* CRM Group */}
         <div className="relative flex-1 flex justify-center">
           <button 
             onClick={() => setActiveMenu(activeMenu === 'crm' ? null : 'crm')}
-            className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${['leads', 'job-cards'].includes(activeTab) ? 'text-yellow-400' : 'text-slate-400'}`}
+            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${['leads', 'job-cards'].includes(activeTab) ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
           >
-            <Users className="w-5 h-5" />
-            <span className="text-[10px] font-bold uppercase tracking-wider">CRM</span>
+            <Users className="w-6 h-6" />
+            <span className="text-[10px] font-black uppercase tracking-widest">CRM</span>
           </button>
           <AnimatePresence>
             {activeMenu === 'crm' && (
               <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute bottom-full mb-2 left-2 bg-slate-800 rounded-lg shadow-xl border border-slate-700 overflow-hidden min-w-[140px]"
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                className="absolute bottom-full mb-4 left-0 bg-slate-800 rounded-2xl shadow-2xl border border-white/10 overflow-hidden min-w-[180px] backdrop-blur-xl"
               >
-                <button 
-                  onClick={() => { setActiveTab('leads'); setActiveMenu(null); }}
-                  className={`w-full text-left px-4 py-3 text-sm font-bold ${activeTab === 'leads' ? 'bg-yellow-400 text-slate-900' : 'text-white hover:bg-slate-700'}`}
-                >
-                  Leads
-                </button>
-                <button 
-                  onClick={() => { setActiveTab('job-cards'); setActiveMenu(null); }}
-                  className={`w-full text-left px-4 py-3 text-sm font-bold border-t border-slate-700 ${activeTab === 'job-cards' ? 'bg-yellow-400 text-slate-900' : 'text-white hover:bg-slate-700'}`}
-                >
-                  Job Cards
-                </button>
+                <div className="p-2 space-y-1">
+                  <button 
+                    onClick={() => { setActiveTab('leads'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'leads' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Service Leads
+                  </button>
+                  <button 
+                    onClick={() => { setActiveTab('job-cards'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'job-cards' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Job Cards
+                  </button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -913,31 +1060,39 @@ export default function Admin() {
         <div className="relative flex-1 flex justify-center">
           <button 
             onClick={() => setActiveMenu(activeMenu === 'content' ? null : 'content')}
-            className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${['services', 'about'].includes(activeTab) ? 'text-yellow-400' : 'text-slate-400'}`}
+            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${['services', 'about', 'jobs'].includes(activeTab) ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
           >
-            <BookOpen className="w-5 h-5" />
-            <span className="text-[10px] font-bold uppercase tracking-wider">Content</span>
+            <BookOpen className="w-6 h-6" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Content</span>
           </button>
           <AnimatePresence>
             {activeMenu === 'content' && (
               <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-800 rounded-lg shadow-xl border border-slate-700 overflow-hidden min-w-[140px]"
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 bg-slate-800 rounded-2xl shadow-2xl border border-white/10 overflow-hidden min-w-[180px] backdrop-blur-xl"
               >
-                <button 
-                  onClick={() => { setActiveTab('services'); setActiveMenu(null); }}
-                  className={`w-full text-left px-4 py-3 text-sm font-bold ${activeTab === 'services' ? 'bg-yellow-400 text-slate-900' : 'text-white hover:bg-slate-700'}`}
-                >
-                  Services
-                </button>
-                <button 
-                  onClick={() => { setActiveTab('about'); setActiveMenu(null); }}
-                  className={`w-full text-left px-4 py-3 text-sm font-bold border-t border-slate-700 ${activeTab === 'about' ? 'bg-yellow-400 text-slate-900' : 'text-white hover:bg-slate-700'}`}
-                >
-                  About
-                </button>
+                <div className="p-2 space-y-1">
+                  <button 
+                    onClick={() => { setActiveTab('services'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'services' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Services
+                  </button>
+                  <button 
+                    onClick={() => { setActiveTab('jobs'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'jobs' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Past Jobs
+                  </button>
+                  <button 
+                    onClick={() => { setActiveTab('about'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'about' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Roadmap
+                  </button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -947,166 +1102,149 @@ export default function Admin() {
         <div className="relative flex-1 flex justify-center">
           <button 
             onClick={() => setActiveMenu(activeMenu === 'settings' ? null : 'settings')}
-            className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${['company'].includes(activeTab) ? 'text-yellow-400' : 'text-slate-400'}`}
+            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${['company', 'forms'].includes(activeTab) ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
           >
-            <Settings className="w-5 h-5" />
-            <span className="text-[10px] font-bold uppercase tracking-wider">Settings</span>
+            <Settings className="w-6 h-6" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Setup</span>
           </button>
           <AnimatePresence>
             {activeMenu === 'settings' && (
               <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute bottom-full mb-2 right-2 bg-slate-800 rounded-lg shadow-xl border border-slate-700 overflow-hidden min-w-[140px]"
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                className="absolute bottom-full mb-4 right-0 bg-slate-800 rounded-2xl shadow-2xl border border-white/10 overflow-hidden min-w-[180px] backdrop-blur-xl"
               >
-                <button 
-                  onClick={() => { setActiveTab('company'); setActiveMenu(null); }}
-                  className={`w-full text-left px-4 py-3 text-sm font-bold ${activeTab === 'company' ? 'bg-yellow-400 text-slate-900' : 'text-white hover:bg-slate-700'}`}
-                >
-                  Company
-                </button>
+                <div className="p-2 space-y-1">
+                  <button 
+                    onClick={() => { setActiveTab('company'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'company' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Brand & Theme
+                  </button>
+                  <button 
+                    onClick={() => { setActiveTab('forms'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'forms' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Form Editor
+                  </button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="flex-grow p-4 md:p-8 md:ml-64 overflow-y-auto">
-        <header className="mb-6 md:mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-          <h2 className="text-2xl font-bold text-slate-900 capitalize">{activeTab.replace('-', ' ')}</h2>
-          <div className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-widest">
-            Last updated: {new Date().toLocaleTimeString()}
-          </div>
-        </header>
-
+      {/* Main Content Area */}
+      <main className="flex-grow p-4 md:p-12 max-w-[1600px] mx-auto w-full">
+        {activeTab === 'forms' && <FormsManager settings={settings} setSettings={setSettings} />}
+        {activeTab === 'jobs' && <JobsManager jobs={jobs} onEdit={setEditingJob} onDelete={handleDeleteJob} />}
         {activeTab === 'leads' && (
-          <div className="space-y-6">
-            {selectedLead ? (
-              <div className="bg-white p-8 rounded-sm shadow-sm border border-slate-200 space-y-8">
-                <div className="flex justify-between items-center border-b pb-4">
-                  <h3 className="text-xl font-bold">Lead Details: {selectedLead.name} {selectedLead.surname}</h3>
-                  <button onClick={() => setSelectedLead(null)} className="text-slate-400 hover:text-slate-600">Back to List</button>
-                </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Leads List */}
+            <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
+              <div className="p-8 border-b border-slate-100 flex justify-between items-center">
+                <h2 className="text-3xl font-bold text-secondary tracking-tight">Service Leads</h2>
+                <span className="bg-primary/10 text-secondary px-4 py-1 rounded-full text-sm font-bold">{leads.length} Total</span>
+              </div>
+              <div className="divide-y divide-slate-100">
+                {leads.map((lead) => (
+                  <button 
+                    key={lead.id}
+                    onClick={() => setSelectedLead(lead)}
+                    className={`w-full text-left p-8 hover:bg-slate-50 transition-all flex justify-between items-center group ${selectedLead?.id === lead.id ? 'bg-slate-50 border-l-4 border-primary' : ''}`}
+                  >
+                    <div className="space-y-1">
+                      <h3 className="font-bold text-xl text-secondary">{lead.name} {lead.surname}</h3>
+                      <p className="text-slate-500 font-medium">{lead.companyName || 'Individual'}</p>
+                      <div className="flex gap-4 text-sm text-slate-400 font-bold uppercase tracking-widest pt-2">
+                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(lead.createdAt).toLocaleDateString()}</span>
+                        <span className="text-primary">{lead.serviceTitle || 'General'}</span>
+                      </div>
+                    </div>
+                    <ChevronRight className={`w-6 h-6 text-slate-300 group-hover:text-primary transition-all ${selectedLead?.id === lead.id ? 'translate-x-2 text-primary' : ''}`} />
+                  </button>
+                ))}
+              </div>
+            </div>
 
-                <div className="grid grid-cols-2 gap-6 md:gap-12">
-                  <div className="space-y-6">
+            {/* Lead Detail / Action Area */}
+            <div className="space-y-8">
+              {selectedLead ? (
+                <motion.div 
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="bg-white rounded-[2.5rem] shadow-xl border border-slate-200 overflow-hidden"
+                >
+                  <div className="p-8 bg-secondary text-white flex justify-between items-center">
                     <div>
-                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Client Information</h4>
-                      <p className="text-lg font-bold text-slate-900">{selectedLead.companyName}</p>
-                      <p className="text-slate-600">{selectedLead.name} {selectedLead.surname}</p>
-                      <p className="text-slate-600">{selectedLead.email}</p>
-                      <p className="text-slate-600">{selectedLead.tel}</p>
-                      <p className="text-slate-600 mt-2">{selectedLead.address}</p>
+                      <h2 className="text-3xl font-bold tracking-tight">{selectedLead.name} {selectedLead.surname}</h2>
+                      <p className="text-slate-400 font-bold uppercase tracking-widest text-sm mt-1">{selectedLead.companyName}</p>
+                    </div>
+                    <button onClick={() => setSelectedLead(null)} className="text-slate-400 hover:text-white transition-colors">
+                      <X className="w-8 h-8" />
+                    </button>
+                  </div>
+                  
+                  <div className="p-8 space-y-8">
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Contact</label>
+                        <p className="font-bold text-secondary flex items-center gap-2"><Mail className="w-4 h-4 text-primary" /> {selectedLead.email}</p>
+                        <p className="font-bold text-secondary flex items-center gap-2 mt-2"><Phone className="w-4 h-4 text-primary" /> {selectedLead.tel}</p>
+                      </div>
+                      <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Location</label>
+                        <p className="font-bold text-secondary flex items-center gap-2"><Building className="w-4 h-4 text-primary" /> {selectedLead.address || 'N/A'}</p>
+                      </div>
                     </div>
 
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Service Requested</h4>
-                      <span className="bg-yellow-400 text-slate-900 text-xs font-bold px-2 py-1 rounded-sm uppercase inline-block mb-2">
-                        {selectedLead.serviceTitle || 'General Inquiry'}
-                      </span>
-                      {selectedLead.checklist && (
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {JSON.parse(selectedLead.checklist).map((item: string, i: number) => (
-                            <span key={i} className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-sm border border-slate-200">
-                              {item}
-                            </span>
+                    {selectedLead.checklist && JSON.parse(selectedLead.checklist).length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-bold text-secondary uppercase tracking-widest border-b border-slate-100 pb-2">Training Required</h3>
+                        <div className="flex flex-wrap gap-3">
+                          {JSON.parse(selectedLead.checklist).map((item: string) => (
+                            <span key={item} className="bg-primary text-secondary px-4 py-2 rounded-xl font-bold text-sm shadow-sm">{item}</span>
                           ))}
                         </div>
-                      )}
-                    </div>
-
-                    {selectedLead.notes && (
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Notes</h4>
-                        <p className="text-slate-600 bg-slate-50 p-4 rounded-sm border border-slate-100 italic">
-                          "{selectedLead.notes}"
-                        </p>
                       </div>
                     )}
-                  </div>
 
-                  <div className="space-y-6">
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Employees for Training</h4>
-                    <div className="space-y-3">
-                      {selectedLead.employees && JSON.parse(selectedLead.employees).map((emp: any, idx: number) => (
-                        <div key={idx} className="bg-slate-50 p-4 rounded-sm border border-slate-200">
-                          <p className="font-bold text-slate-900">{emp.name}</p>
-                          <div className="flex gap-4 text-xs text-slate-500 mt-1">
-                            <span>Age: {emp.age}</span>
-                            <span>Role: {emp.jobTitle}</span>
-                            {emp.whatsapp && <span>WA: {emp.whatsapp}</span>}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border-t pt-8">
-                  <h3 className="text-xl font-bold mb-6">Create Job Card</h3>
-                  <JobCardForm lead={selectedLead} services={services} onComplete={() => { setSelectedLead(null); fetchData(); }} />
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {leads.length === 0 ? (
-                  <div className="bg-white p-12 text-center rounded-sm shadow-sm border border-slate-200">
-                    <Mail className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                    <p className="text-slate-500">No leads received yet.</p>
-                  </div>
-                ) : (
-                  leads.map((lead) => (
-                    <div 
-                      key={lead.id} 
-                      onClick={() => setSelectedLead(lead)}
-                      className="bg-white rounded-sm shadow-sm border border-slate-200 overflow-hidden cursor-pointer hover:border-yellow-400 transition-colors group"
-                    >
-                      <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center group-hover:bg-yellow-50 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <span className="bg-yellow-400 text-slate-900 text-xs font-bold px-2 py-1 rounded-sm uppercase">
-                            {lead.serviceTitle || 'General Inquiry'}
-                          </span>
-                          <span className="text-slate-400 text-sm flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            {new Date(lead.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <span className="text-slate-500 text-xs font-mono">ID: #{lead.id}</span>
-                          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-yellow-500" />
+                    {selectedLead.employees && JSON.parse(selectedLead.employees).length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-bold text-secondary uppercase tracking-widest border-b border-slate-100 pb-2">Employee Details</h3>
+                        <div className="grid grid-cols-1 gap-3">
+                          {JSON.parse(selectedLead.employees).map((emp: any, i: number) => (
+                            <div key={i} className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+                              <div>
+                                <p className="font-bold text-secondary">{emp.name}</p>
+                                <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">{emp.jobTitle} • Age: {emp.age}</p>
+                              </div>
+                              {emp.whatsapp && <span className="text-green-600 font-bold text-xs">WA: {emp.whatsapp}</span>}
+                            </div>
+                          ))}
                         </div>
                       </div>
-                      <div className="p-6 grid grid-cols-3 gap-4 md:gap-8">
-                        <div className="space-y-4">
-                          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Contact Info</h4>
-                          <div className="space-y-2">
-                            <p className="font-bold text-slate-900">{lead.name} {lead.surname}</p>
-                            <p className="text-slate-600 flex items-center gap-2"><Building className="w-4 h-4" /> {lead.companyName}</p>
-                            <p className="text-slate-600 flex items-center gap-2"><Phone className="w-4 h-4" /> {lead.tel}</p>
-                          </div>
-                        </div>
-                        <div className="space-y-4">
-                          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Checklist Selections</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {JSON.parse(lead.checklist || '[]').map((item: string, idx: number) => (
-                              <span key={idx} className="bg-slate-100 text-slate-700 text-xs px-2 py-1 rounded-sm border border-slate-200 flex items-center gap-1">
-                                <CheckSquare className="w-3 h-3" /> {item}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="space-y-4">
-                          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Quick Actions</h4>
-                          <button className="text-xs font-bold uppercase tracking-wider text-yellow-600 hover:text-yellow-700">View & Create Job Card</button>
-                        </div>
-                      </div>
+                    )}
+
+                    <div className="pt-8 border-t border-slate-100 flex gap-4">
+                      <button 
+                        onClick={() => setConfirmProcessed(true)}
+                        className="flex-1 bg-primary text-secondary py-4 rounded-2xl font-bold uppercase tracking-widest shadow-lg hover:scale-[1.02] transition-all"
+                      >
+                        Create Job Card
+                      </button>
                     </div>
-                  ))
-                )}
-              </div>
-            )}
+                  </div>
+                </motion.div>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-center p-12 bg-white rounded-[2.5rem] border-2 border-dashed border-slate-200 text-slate-400">
+                  <Users className="w-20 h-20 mb-6 opacity-20" />
+                  <h3 className="text-2xl font-bold mb-2">No Lead Selected</h3>
+                  <p className="max-w-xs font-medium">Select a lead from the list to view details and generate job cards.</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
