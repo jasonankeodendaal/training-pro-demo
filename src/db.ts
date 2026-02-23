@@ -2,11 +2,11 @@ import Database from "better-sqlite3";
 import path from "path";
 import fs from "fs";
 
-const dbPath = process.env.VERCEL ? path.join("/tmp", "database.sqlite") : path.resolve(process.cwd(), "database.sqlite");
+const dbPath = process.env.VERCEL ? path.join("/tmp", "database.sqlite") : path.resolve(__dirname, "..", "database.sqlite");
 
 // On Vercel, copy the database from the project root to the writable /tmp directory if it doesn't exist
 if (process.env.VERCEL) {
-  const sourceDbPath = path.resolve(process.cwd(), "database.sqlite");
+  const sourceDbPath = path.resolve(__dirname, "..", "database.sqlite");
   if (fs.existsSync(sourceDbPath) && !fs.existsSync(dbPath)) {
     fs.copyFileSync(sourceDbPath, dbPath);
   }

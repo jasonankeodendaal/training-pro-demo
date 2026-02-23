@@ -4,9 +4,13 @@ import db from "./src/db.ts";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Ensure uploads directory exists
-const uploadDir = process.env.VERCEL ? path.join("/tmp", "uploads") : path.resolve("uploads");
+const uploadDir = process.env.VERCEL ? path.join("/tmp", "uploads") : path.resolve(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
@@ -270,16 +274,6 @@ async function setupServer() {
       appType: "spa",
     });
     app.use(vite.middlewares);
-  } else {
-    // In production, serve static files from dist
-    const distPath = path.resolve(process.cwd(), "dist");
-    if (fs.existsSync(distPath)) {
-      app.use(express.static(distPath));
-      app.get("*", (req, res, next) => {
-        if (req.path.startsWith("/api")) return next();
-        res.sendFile(path.resolve(distPath, "index.html"));
-      });
-    }
   }
 
   const defaultContactForm = [
