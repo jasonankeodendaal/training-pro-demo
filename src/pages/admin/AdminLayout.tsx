@@ -13,6 +13,8 @@ import {
   BookOpen
 } from 'lucide-react';
 
+import AdminHeader from './components/AdminHeader';
+
 export default function AdminLayout() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const location = useLocation();
@@ -58,9 +60,19 @@ export default function AdminLayout() {
 
   return (
     <div className="w-full bg-slate-50 min-h-screen pb-24">
+      <AdminHeader />
       <header className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-30 flex justify-between items-center">
         <h1 className="text-lg font-black text-slate-900 uppercase tracking-tighter">Admin <span className="text-yellow-500">Pro</span></h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => {
+              localStorage.removeItem('isAuthenticated');
+              window.location.href = '/login';
+            }}
+            className="bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700"
+          >
+            Logout
+          </button>
           <div className="w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center text-white text-xs font-bold">JD</div>
         </div>
       </header>

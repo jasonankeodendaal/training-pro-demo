@@ -22,6 +22,18 @@ export default function AdminNav() {
               <h1 className="text-white font-bold">TrainingPro Admin</h1>
             </div>
             <div className="hidden md:block">
+            <div className="ml-4 flex items-center md:ml-6">
+              <button
+                onClick={() => {
+                  localStorage.removeItem('isAuthenticated');
+                  window.location.href = '/login';
+                }}
+                className="bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
               <div className="ml-10 flex items-baseline space-x-4">
                 {navLinks.map((link) => (
                   <NavLink

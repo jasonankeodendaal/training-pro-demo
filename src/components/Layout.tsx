@@ -274,6 +274,7 @@ export default function Layout() {
             <div className="flex gap-6 text-[10px] md:text-sm text-slate-500 uppercase tracking-widest font-bold">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+              <Link to="/admin" className="hover:text-white transition-colors">Admin</Link>
             </div>
           </div>
         </div>
