@@ -469,6 +469,10 @@ function FormsManager({ settings, setSettings }: { settings: any, setSettings: (
   );
 }
 
+import Dashboard from './admin/components/Dashboard';
+import ContentManager from './admin/components/ContentManager';
+import Settings from './admin/components/Settings';
+
 function AdminHeader() {
   return (
     <header className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-30 flex justify-between items-center">
@@ -536,8 +540,7 @@ function JobsManager({ jobs, onEdit, onDelete }: { jobs: any[], onEdit: (j: any)
 import AdminLayout from './admin/AdminLayout';
 
 export default function Admin() {
-  const [activeTab, setActiveTab] = useState('leads');
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [leads, setLeads] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
@@ -1042,123 +1045,56 @@ export default function Admin() {
     <div className="flex flex-col min-h-screen bg-slate-100 pb-24">
       {/* Unified Bottom Tab Bar (App Feeling) */}
       <nav className="fixed bottom-0 left-0 right-0 bg-slate-900 text-white flex justify-around items-center h-20 z-[100] px-4 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.3)] border-t border-white/5">
-        {/* CRM Group */}
+        {/* Dashboard Button */}
         <div className="relative flex-1 flex justify-center">
           <button 
-            onClick={() => setActiveMenu(activeMenu === 'crm' ? null : 'crm')}
+            onClick={() => setActiveTab('dashboard')}
+            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${activeTab === 'dashboard' ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
+          >
+            <LayoutDashboard className="w-6 h-6" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Dashboard</span>
+          </button>
+        </div>
+
+        {/* CRM Button */}
+        <div className="relative flex-1 flex justify-center">
+          <button 
+            onClick={() => setActiveTab('leads')}
             className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${['leads', 'job-cards'].includes(activeTab) ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
           >
             <Users className="w-6 h-6" />
             <span className="text-[10px] font-black uppercase tracking-widest">CRM</span>
           </button>
-          <AnimatePresence>
-            {activeMenu === 'crm' && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                className="absolute bottom-full mb-4 left-0 bg-slate-800 rounded-2xl shadow-2xl border border-white/10 overflow-hidden min-w-[180px] backdrop-blur-xl"
-              >
-                <div className="p-2 space-y-1">
-                  <button 
-                    onClick={() => { setActiveTab('leads'); setActiveMenu(null); }}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'leads' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
-                  >
-                    Service Leads
-                  </button>
-                  <button 
-                    onClick={() => { setActiveTab('job-cards'); setActiveMenu(null); }}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'job-cards' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
-                  >
-                    Job Cards
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
-        {/* Content Group */}
+        {/* Content Management Button */}
         <div className="relative flex-1 flex justify-center">
           <button 
-            onClick={() => setActiveMenu(activeMenu === 'content' ? null : 'content')}
-            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${['services', 'about', 'jobs'].includes(activeTab) ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
+            onClick={() => setActiveTab('content')}
+            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${activeTab === 'content' ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
           >
             <BookOpen className="w-6 h-6" />
             <span className="text-[10px] font-black uppercase tracking-widest">Content</span>
           </button>
-          <AnimatePresence>
-            {activeMenu === 'content' && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 bg-slate-800 rounded-2xl shadow-2xl border border-white/10 overflow-hidden min-w-[180px] backdrop-blur-xl"
-              >
-                <div className="p-2 space-y-1">
-                  <button 
-                    onClick={() => { setActiveTab('services'); setActiveMenu(null); }}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'services' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
-                  >
-                    Services
-                  </button>
-                  <button 
-                    onClick={() => { setActiveTab('jobs'); setActiveMenu(null); }}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'jobs' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
-                  >
-                    Past Jobs
-                  </button>
-                  <button 
-                    onClick={() => { setActiveTab('about'); setActiveMenu(null); }}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'about' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
-                  >
-                    Roadmap
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
-        {/* Settings Group */}
+        {/* Settings Button */}
         <div className="relative flex-1 flex justify-center">
           <button 
-            onClick={() => setActiveMenu(activeMenu === 'settings' ? null : 'settings')}
-            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${['company', 'forms'].includes(activeTab) ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
+            onClick={() => setActiveTab('settings')}
+            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${activeTab === 'settings' ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
           >
             <Settings className="w-6 h-6" />
             <span className="text-[10px] font-black uppercase tracking-widest">Setup</span>
           </button>
-          <AnimatePresence>
-            {activeMenu === 'settings' && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                className="absolute bottom-full mb-4 right-0 bg-slate-800 rounded-2xl shadow-2xl border border-white/10 overflow-hidden min-w-[180px] backdrop-blur-xl"
-              >
-                <div className="p-2 space-y-1">
-                  <button 
-                    onClick={() => { setActiveTab('company'); setActiveMenu(null); }}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'company' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
-                  >
-                    Brand & Theme
-                  </button>
-                  <button 
-                    onClick={() => { setActiveTab('forms'); setActiveMenu(null); }}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'forms' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
-                  >
-                    Form Editor
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </nav>
 
       {/* Main Content Area */}
       <main className="flex-grow p-4 md:p-12 max-w-[1600px] mx-auto w-full">
+        {activeTab === 'dashboard' && <Dashboard leads={leads} jobCards={jobCards} />}
+        {activeTab === 'content' && <ContentManager services={services} jobs={jobs} about={settings.about} onEditService={setEditingService} onEditJob={setEditingJob} onSaveAbout={() => setActiveTab('about')} />}
+        {activeTab === 'settings' && <Settings settings={settings} onSettingsChange={setSettings} onSave={() => handleSaveAllLocationSettings()} />}
         {activeTab === 'forms' && <FormsManager settings={settings} setSettings={setSettings} />}
         {activeTab === 'jobs' && <JobsManager jobs={jobs} onEdit={setEditingJob} onDelete={handleDeleteJob} />}
         {activeTab === 'leads' && (

@@ -26,7 +26,7 @@ export default function Layout() {
         setSettings({ 
           header, 
           footer, 
-          company: company || { name: header.siteName, logo: "" },
+          company: company || { name: header.siteName, logo: "", address: "", phone: "", email: "" },
           theme: theme || { primaryColor: "#facc15", secondaryColor: "#0f172a", fontFamily: "Inter" },
           contactForm,
           courseForm

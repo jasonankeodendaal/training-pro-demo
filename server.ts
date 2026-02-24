@@ -171,6 +171,10 @@ async function setupServer() {
       try {
         const row = db.prepare("SELECT value FROM settings WHERE key = ?").get(req.params.key) as { value: string };
         if (!row) {
+          // Return a default-like structure or an empty object for settings that might not exist
+          if (req.params.key === 'company_details') {
+            return res.json({ name: "", address: "", phone: "", email: "" });
+          }
           return res.status(404).json({ error: "Setting not found" });
         }
         res.json(JSON.parse(row.value));
