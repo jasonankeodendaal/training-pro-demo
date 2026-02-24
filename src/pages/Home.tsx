@@ -18,34 +18,34 @@ export default function Home() {
   const [settings, setSettings] = useState<any>(null);
 
   useEffect(() => {
-    fetch('/api/services')
-      .then(res => res.ok ? res.json() : Promise.reject('Failed'))
-      .then(data => setServices(data))
-      .catch(err => {
-        console.error("Failed to fetch services", err);
-        setServices([]);
-      });
-
-    fetch('/api/jobs')
-      .then(res => res.ok ? res.json() : Promise.reject('Failed'))
-      .then(data => setJobs(data))
-      .catch(err => {
-        console.error("Failed to fetch jobs", err);
-        setJobs([]);
-      });
-
-    fetch('/api/settings/home')
-      .then(res => res.ok ? res.json() : Promise.reject('Failed'))
-      .then(data => setSettings(data))
-      .catch(err => {
-        console.error("Failed to fetch home settings", err);
+    const fetchData = async () => {
+      try {
+        const [servicesRes, jobsRes] = await Promise.all([
+          fetch('/api/services').then(res => res.json()),
+          fetch('/api/jobs').then(res => res.json()),
+        ]);
+        setServices(servicesRes);
+        setJobs(jobsRes);
         setSettings({
           heroImages: ["https://picsum.photos/seed/hero1/1920/1080"],
           heroTitle: "Safety Excellence Without Compromise.",
           heroSubtitle: "Delivering industry-leading safety and operational training since 2010.",
           ctaButtons: [{ text: "Read More", url: "/about", primary: true }]
         });
-      });
+      } catch (error) {
+        console.error("Failed to fetch data", error);
+        setServices([]);
+        setJobs([]);
+        setSettings({
+          heroImages: ["https://picsum.photos/seed/hero1/1920/1080"],
+          heroTitle: "Safety Excellence Without Compromise.",
+          heroSubtitle: "Delivering industry-leading safety and operational training since 2010.",
+          ctaButtons: [{ text: "Read More", url: "/about", primary: true }]
+        });
+      }
+    };
+
+    fetchData();
   }, []);
 
   useEffect(() => {

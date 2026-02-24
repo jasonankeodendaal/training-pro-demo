@@ -18,17 +18,20 @@ export default function Catalog() {
   const [filteredServices, setFilteredServices] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('/api/services')
-      .then(res => res.json())
-      .then(data => {
+    const fetchServices = async () => {
+      try {
+        const response = await fetch('/api/services');
+        const data = await response.json();
         setServices(data);
         setFilteredServices(data);
+      } catch (error) {
+        console.error("Failed to fetch services", error);
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to fetch services", err);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchServices();
   }, []);
 
   useEffect(() => {

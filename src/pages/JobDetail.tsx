@@ -8,10 +8,17 @@ export default function JobDetail() {
   const [job, setJob] = useState<any>(null);
 
   useEffect(() => {
-    fetch(`/api/jobs/${id}`)
-      .then(res => res.json())
-      .then(data => setJob(data))
-      .catch(err => console.error("Failed to fetch job details", err));
+    const fetchJob = async () => {
+      try {
+        const response = await fetch(`/api/jobs/${id}`);
+        const data = await response.json();
+        setJob(data);
+      } catch (error) {
+        console.error("Failed to fetch job details", error);
+      }
+    };
+
+    fetchJob();
   }, [id]);
 
   if (!job) return (

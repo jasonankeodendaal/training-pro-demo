@@ -469,30 +469,6 @@ function FormsManager({ settings, setSettings }: { settings: any, setSettings: (
   );
 }
 
-import Dashboard from './admin/components/Dashboard';
-import ContentManager from './admin/components/ContentManager';
-import Settings from './admin/components/Settings';
-
-function AdminHeader() {
-  return (
-    <header className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-30 flex justify-between items-center">
-      <h1 className="text-lg font-black text-slate-900 uppercase tracking-tighter">Admin <span className="text-yellow-500">Pro</span></h1>
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => {
-            localStorage.removeItem('isAuthenticated');
-            window.location.href = '/login';
-          }}
-          className="bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700"
-        >
-          Logout
-        </button>
-        <div className="w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center text-white text-xs font-bold">JD</div>
-      </div>
-    </header>
-  );
-}
-
 function JobsManager({ jobs, onEdit, onDelete }: { jobs: any[], onEdit: (j: any) => void, onDelete: (id: number) => void }) {
   return (
     <div className="space-y-8">
@@ -537,10 +513,9 @@ function JobsManager({ jobs, onEdit, onDelete }: { jobs: any[], onEdit: (j: any)
   );
 }
 
-import AdminLayout from './admin/AdminLayout';
-
 export default function Admin() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('leads');
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [leads, setLeads] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
@@ -550,266 +525,22 @@ export default function Admin() {
   const [confirmProcessed, setConfirmProcessed] = useState(false);
   const [editingService, setEditingService] = useState<any>(null);
   const [editingJob, setEditingJob] = useState<any>(null);
-  const [settings, setSettings] = useState<any>({
-    header: null,
-    footer: null,
-    home: null,
-    about: null,
-    company_details: null,
-    theme_settings: null,
-    locations: null
-  });
-  const [saving, setSaving] = useState(false);
-
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    const [leadsRes, servicesRes, jobsRes, cardsRes, headerRes, footerRes, homeRes, aboutRes, companyRes, themeRes, locationsRes, contactFormRes, courseFormRes] = await Promise.all([
+    const [leadsRes, servicesRes, jobsRes, cardsRes] = await Promise.all([
       fetch('/api/admin/leads').then(r => r.json()),
       fetch('/api/services').then(r => r.json()),
       fetch('/api/jobs').then(r => r.json()),
       fetch('/api/admin/job-cards').then(r => r.json()),
-      fetch('/api/settings/header').then(r => r.json()),
-      fetch('/api/settings/footer').then(r => r.json()),
-      fetch('/api/settings/home').then(r => r.json()),
-      fetch('/api/settings/about').then(r => r.json()),
-      fetch('/api/settings/company_details').then(r => r.json().catch(() => null)),
-      fetch('/api/settings/theme_settings').then(r => r.json().catch(() => null)),
-      fetch('/api/settings/locations').then(r => r.json().catch(() => null)),
-      fetch('/api/settings/contact_form').then(r => r.json().catch(() => [])),
-      fetch('/api/settings/course_form').then(r => r.json().catch(() => []))
     ]);
 
     setLeads(leadsRes);
     setServices(servicesRes);
     setJobs(jobsRes);
     setJobCards(cardsRes);
-    setSettings({
-      header: headerRes,
-      footer: footerRes,
-      home: homeRes,
-      about: aboutRes,
-      company_details: companyRes,
-      theme_settings: themeRes,
-      locations: locationsRes,
-      contact_form: contactFormRes,
-      course_form: courseFormRes
-    });
-
-    // Ensure socialLinks is an array for Admin compatibility
-    if (footerRes && footerRes.socialLinks && !Array.isArray(footerRes.socialLinks)) {
-      footerRes.socialLinks = [
-        { id: "1", platform: "Facebook", url: footerRes.socialLinks.facebook || "#", icon: "" },
-        { id: "2", platform: "Twitter", url: footerRes.socialLinks.twitter || "#", icon: "" },
-        { id: "3", platform: "Instagram", url: footerRes.socialLinks.instagram || "#", icon: "" },
-        { id: "4", platform: "LinkedIn", url: footerRes.socialLinks.linkedin || "#", icon: "" }
-      ];
-    }
-
-    // Normalize About settings
-    if (aboutRes) {
-      if (!aboutRes.heroImages) {
-        aboutRes.heroImages = aboutRes.heroImage ? [aboutRes.heroImage] : [];
-      }
-      if (!aboutRes.fullStory) {
-        aboutRes.fullStory = "";
-      }
-    }
-
-    // Normalize Home settings
-    if (homeRes) {
-      if (!homeRes.heroImages) homeRes.heroImages = [];
-      if (!homeRes.heroTitle) homeRes.heroTitle = "Safety Excellence Without Compromise.";
-      if (!homeRes.heroSubtitle) homeRes.heroSubtitle = "Delivering industry-leading safety and operational training since 2010.";
-      if (!homeRes.ctaButtons) {
-        homeRes.ctaButtons = [
-          { text: "Read More", url: "/about", primary: true },
-          { text: "Contact", url: "#contact", primary: false }
-        ];
-      }
-    }
-
-    setSettings({
-      header: headerRes,
-      footer: footerRes,
-      home: homeRes,
-      about: aboutRes,
-      company_details: companyRes || {
-        name: "", address: "", phone: "", email: "", openHours: "", mapUrl: "", logo: ""
-      },
-      theme_settings: themeRes || {
-        primaryColor: "#facc15", secondaryColor: "#0f172a", fontFamily: "Inter"
-      },
-      locations: locationsRes || {
-        heroImage: ""
-      }
-    });
-  };
-
-  const handleHomeHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const newImages = [...(settings.home.heroImages || [])];
-      for (let i = 0; i < e.target.files.length; i++) {
-        const url = await handleFileUpload(e.target.files[i]);
-        if (url) newImages.push(url);
-      }
-      setSettings({ ...settings, home: { ...settings.home, heroImages: newImages } });
-    }
-  };
-
-  const removeHomeHeroImage = (index: number) => {
-    const newImages = [...settings.home.heroImages];
-    newImages.splice(index, 1);
-    setSettings({ ...settings, home: { ...settings.home, heroImages: newImages } });
-  };
-
-  const addCtaButton = () => {
-    const newButtons = [...(settings.home.ctaButtons || [])];
-    newButtons.push({ text: "New Button", url: "/", primary: true });
-    setSettings({ ...settings, home: { ...settings.home, ctaButtons: newButtons } });
-  };
-
-  const removeCtaButton = (index: number) => {
-    const newButtons = [...settings.home.ctaButtons];
-    newButtons.splice(index, 1);
-    setSettings({ ...settings, home: { ...settings.home, ctaButtons: newButtons } });
-  };
-
-  const updateCtaButton = (index: number, field: string, value: any) => {
-    const newButtons = [...settings.home.ctaButtons];
-    newButtons[index] = { ...newButtons[index], [field]: value };
-    setSettings({ ...settings, home: { ...settings.home, ctaButtons: newButtons } });
-  };
-
-  const handleFileUpload = async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (res.ok) {
-        const data = await res.json();
-        return data.filePath;
-      }
-      return null;
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      return null;
-    }
-  };
-
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    const filePath = await handleFileUpload(e.target.files[0]);
-    if (filePath) {
-      setSettings({
-        ...settings, 
-        company_details: { ...settings.company_details, logo: filePath }
-      });
-    } else {
-      alert('Failed to upload logo');
-    }
-  };
-
-  const handleLocationsHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    const filePath = await handleFileUpload(e.target.files[0]);
-    if (filePath) {
-      setSettings({
-        ...settings, 
-        locations: { ...settings.locations, heroImage: filePath }
-      });
-    } else {
-      alert('Failed to upload hero image');
-    }
-  };
-
-  const handleSocialIconUpload = async (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    const filePath = await handleFileUpload(e.target.files[0]);
-    if (filePath) {
-      const updatedLinks = settings.footer.socialLinks.map((link: any) => 
-        link.id === id ? { ...link, icon: filePath } : link
-      );
-      setSettings({
-        ...settings,
-        footer: { ...settings.footer, socialLinks: updatedLinks }
-      });
-    } else {
-      alert('Failed to upload icon');
-    }
-  };
-
-  const addSocialLink = () => {
-    const newLink = { id: Date.now().toString(), platform: "New Platform", url: "#", icon: "" };
-    setSettings({
-      ...settings,
-      footer: { ...settings.footer, socialLinks: [...settings.footer.socialLinks, newLink] }
-    });
-  };
-
-  const removeSocialLink = (id: string) => {
-    const updatedLinks = settings.footer.socialLinks.filter((link: any) => link.id !== id);
-    setSettings({
-      ...settings,
-      footer: { ...settings.footer, socialLinks: updatedLinks }
-    });
-  };
-
-  const updateSocialLink = (id: string, field: string, value: string) => {
-    const updatedLinks = settings.footer.socialLinks.map((link: any) => 
-      link.id === id ? { ...link, [field]: value } : link
-    );
-    setSettings({
-      ...settings,
-      footer: { ...settings.footer, socialLinks: updatedLinks }
-    });
-  };
-
-  const handleSaveSettings = async (key: string) => {
-    setSaving(true);
-    try {
-      await fetch(`/api/settings/${key}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings[key])
-      });
-      alert('Settings saved successfully');
-    } catch (error) {
-      alert('Failed to save settings');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleSaveAllLocationSettings = async () => {
-    setSaving(true);
-    try {
-      await Promise.all([
-        fetch('/api/settings/locations', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(settings.locations)
-        }),
-        fetch('/api/settings/company_details', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(settings.company_details)
-        })
-      ]);
-      alert('All location and contact settings saved successfully');
-    } catch (error) {
-      console.error(error);
-      alert('Failed to save settings');
-    } finally {
-      setSaving(false);
-    }
   };
 
   const handleServiceVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1045,56 +776,123 @@ export default function Admin() {
     <div className="flex flex-col min-h-screen bg-slate-100 pb-24">
       {/* Unified Bottom Tab Bar (App Feeling) */}
       <nav className="fixed bottom-0 left-0 right-0 bg-slate-900 text-white flex justify-around items-center h-20 z-[100] px-4 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.3)] border-t border-white/5">
-        {/* Dashboard Button */}
+        {/* CRM Group */}
         <div className="relative flex-1 flex justify-center">
           <button 
-            onClick={() => setActiveTab('dashboard')}
-            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${activeTab === 'dashboard' ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
-          >
-            <LayoutDashboard className="w-6 h-6" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Dashboard</span>
-          </button>
-        </div>
-
-        {/* CRM Button */}
-        <div className="relative flex-1 flex justify-center">
-          <button 
-            onClick={() => setActiveTab('leads')}
+            onClick={() => setActiveMenu(activeMenu === 'crm' ? null : 'crm')}
             className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${['leads', 'job-cards'].includes(activeTab) ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
           >
             <Users className="w-6 h-6" />
             <span className="text-[10px] font-black uppercase tracking-widest">CRM</span>
           </button>
+          <AnimatePresence>
+            {activeMenu === 'crm' && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                className="absolute bottom-full mb-4 left-0 bg-slate-800 rounded-2xl shadow-2xl border border-white/10 overflow-hidden min-w-[180px] backdrop-blur-xl"
+              >
+                <div className="p-2 space-y-1">
+                  <button 
+                    onClick={() => { setActiveTab('leads'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'leads' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Service Leads
+                  </button>
+                  <button 
+                    onClick={() => { setActiveTab('job-cards'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'job-cards' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Job Cards
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Content Management Button */}
+        {/* Content Group */}
         <div className="relative flex-1 flex justify-center">
           <button 
-            onClick={() => setActiveTab('content')}
-            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${activeTab === 'content' ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
+            onClick={() => setActiveMenu(activeMenu === 'content' ? null : 'content')}
+            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${['services', 'about', 'jobs'].includes(activeTab) ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
           >
             <BookOpen className="w-6 h-6" />
             <span className="text-[10px] font-black uppercase tracking-widest">Content</span>
           </button>
+          <AnimatePresence>
+            {activeMenu === 'content' && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 bg-slate-800 rounded-2xl shadow-2xl border border-white/10 overflow-hidden min-w-[180px] backdrop-blur-xl"
+              >
+                <div className="p-2 space-y-1">
+                  <button 
+                    onClick={() => { setActiveTab('services'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'services' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Services
+                  </button>
+                  <button 
+                    onClick={() => { setActiveTab('jobs'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'jobs' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Past Jobs
+                  </button>
+                  <button 
+                    onClick={() => { setActiveTab('about'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'about' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Roadmap
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Settings Button */}
+        {/* Settings Group */}
         <div className="relative flex-1 flex justify-center">
           <button 
-            onClick={() => setActiveTab('settings')}
-            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${activeTab === 'settings' ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
+            onClick={() => setActiveMenu(activeMenu === 'settings' ? null : 'settings')}
+            className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${['company', 'forms'].includes(activeTab) ? 'text-primary scale-110' : 'text-slate-500 hover:text-slate-300'}`}
           >
             <Settings className="w-6 h-6" />
             <span className="text-[10px] font-black uppercase tracking-widest">Setup</span>
           </button>
+          <AnimatePresence>
+            {activeMenu === 'settings' && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                className="absolute bottom-full mb-4 right-0 bg-slate-800 rounded-2xl shadow-2xl border border-white/10 overflow-hidden min-w-[180px] backdrop-blur-xl"
+              >
+                <div className="p-2 space-y-1">
+                  <button 
+                    onClick={() => { setActiveTab('company'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'company' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Brand & Theme
+                  </button>
+                  <button 
+                    onClick={() => { setActiveTab('forms'); setActiveMenu(null); }}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'forms' ? 'bg-primary text-secondary' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Form Editor
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </nav>
 
       {/* Main Content Area */}
       <main className="flex-grow p-4 md:p-12 max-w-[1600px] mx-auto w-full">
-        {activeTab === 'dashboard' && <Dashboard leads={leads} jobCards={jobCards} />}
-        {activeTab === 'content' && <ContentManager services={services} jobs={jobs} about={settings.about} onEditService={setEditingService} onEditJob={setEditingJob} onSaveAbout={() => setActiveTab('about')} />}
-        {activeTab === 'settings' && <Settings settings={settings} onSettingsChange={setSettings} onSave={() => handleSaveAllLocationSettings()} />}
         {activeTab === 'forms' && <FormsManager settings={settings} setSettings={setSettings} />}
         {activeTab === 'jobs' && <JobsManager jobs={jobs} onEdit={setEditingJob} onDelete={handleDeleteJob} />}
         {activeTab === 'leads' && (

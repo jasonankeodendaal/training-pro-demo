@@ -33,16 +33,19 @@ export default function ServiceDetail() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/services/${id}`)
-      .then(res => res.json())
-      .then(data => {
+    const fetchService = async () => {
+      try {
+        const response = await fetch(`/api/services/${id}`);
+        const data = await response.json();
         setService(data);
+      } catch (error) {
+        console.error("Failed to fetch service", error);
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to fetch service", err);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchService();
   }, [id]);
 
   const handleChecklistChange = (option: string) => {
