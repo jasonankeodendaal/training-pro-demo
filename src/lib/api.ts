@@ -1,5 +1,25 @@
 import { supabase } from './supabaseClient';
-import { mockServices, mockJobs } from './localdata';
+import { mockServices, mockJobs, mockLeads, mockJobCards } from './localdata';
+
+export async function getLeads() {
+  if (supabase) {
+    const { data, error } = await supabase.from('leads').select('*');
+    if (error) throw error;
+    return data;
+  } else {
+    return mockLeads;
+  }
+}
+
+export async function getJobCards() {
+  if (supabase) {
+    const { data, error } = await supabase.from('job_cards').select('*');
+    if (error) throw error;
+    return data;
+  } else {
+    return mockJobCards;
+  }
+}
 
 export async function getServices() {
   if (supabase) {

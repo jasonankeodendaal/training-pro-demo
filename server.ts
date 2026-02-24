@@ -1,6 +1,24 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
-import { getServices, getServiceById, getJobs, getJobById } from './src/lib/api';
+import { getServices, getServiceById, getJobs, getJobById, getLeads, getJobCards } from './src/lib/api';
+
+app.get("/api/admin/leads", async (req, res) => {
+  try {
+    const leads = await getLeads();
+    res.json(leads);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+app.get("/api/admin/job-cards", async (req, res) => {
+  try {
+    const jobCards = await getJobCards();
+    res.json(jobCards);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
 
   app.get("/api/services", async (req, res) => {
     try {
