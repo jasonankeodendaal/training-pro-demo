@@ -8,18 +8,21 @@ export default function Layout() {
   const [settings, setSettings] = useState<any>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [supabaseConnected, setSupabaseConnected] = useState<boolean | null>(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const [header, footer, company, theme, contactForm, courseForm] = await Promise.all([
+        const [header, footer, company, theme, contactForm, courseForm, status] = await Promise.all([
           fetch('/api/settings/header').then(r => r.ok ? r.json() : Promise.reject('Failed')),
           fetch('/api/settings/footer').then(r => r.ok ? r.json() : Promise.reject('Failed')),
           fetch('/api/settings/company_details').then(r => r.json().catch(() => null)),
           fetch('/api/settings/theme_settings').then(r => r.json().catch(() => null)),
           fetch('/api/settings/contact_form').then(r => r.json().catch(() => [])),
-          fetch('/api/settings/course_form').then(r => r.json().catch(() => []))
+          fetch('/api/settings/course_form').then(r => r.json().catch(() => [])),
+          fetch('/api/status').then(r => r.json().catch(() => ({ supabaseConnected: false })))
         ]);
+        setSupabaseConnected(status.supabaseConnected);
         setSettings({ 
           header, 
           footer, 
@@ -257,9 +260,17 @@ export default function Layout() {
           </div>
           
           <div className="pt-8 md:pt-12 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-slate-500 text-[10px] md:text-lg text-center md:text-left">
-              &copy; {new Date().getFullYear()} {settings.company.name || settings.footer.copyright}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-slate-500 text-[10px] md:text-lg text-center md:text-left">
+                &copy; {new Date().getFullYear()} {settings.company.name || settings.footer.copyright}
+              </p>
+              {supabaseConnected !== null && (
+                <div 
+                  className={`w-2 h-2 rounded-full ${supabaseConnected ? 'bg-green-500' : 'bg-red-500'}`} 
+                  title={supabaseConnected ? "Connected to Supabase" : "Using local mock data"}
+                />
+              )}
+            </div>
             <div className="flex gap-6 text-[10px] md:text-sm text-slate-500 uppercase tracking-widest font-bold">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
